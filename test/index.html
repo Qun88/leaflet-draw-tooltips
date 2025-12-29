@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaflet Draw External Tooltip - 测试</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <!-- Leaflet Draw CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  
+  <!-- Plugin CSS -->
+  <link rel="stylesheet" href="../dist/leaflet-draw-hint.css" />
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+    }
+    
+    .header {
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .container {
+      display: flex;
+      height: calc(100vh - 80px);
+    }
+    
+    .sidebar {
+      width: 350px;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+      overflow-y: auto;
+    }
+    
+    .hint-section {
+      margin-bottom: 30px;
+    }
+    
+    .hint-section h2 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    
+    #draw-hint {
+      padding: 16px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      min-height: 80px;
+      display: none;
+    }
+    
+    #draw-hint.visible {
+      display: block;
+    }
+    
+    #draw-hint.is-error {
+      background: #fff5f5;
+      border-color: #ffccc7;
+    }
+    
+    .status-section {
+      margin-top: 20px;
+    }
+    
+    .status-item {
+      padding: 8px 12px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    
+    .status-item strong {
+      color: #555;
+    }
+    
+    .status-item.success {
+      background: #f6ffed;
+      color: #52c41a;
+      border: 1px solid #b7eb8f;
+    }
+    
+    .status-item.error {
+      background: #fff2f0;
+      color: #f5222d;
+      border: 1px solid #ffccc7;
+    }
+    
+    .instructions {
+      background: #e6f7ff;
+      padding: 12px;
+      border-radius: 4px;
+      border-left: 3px solid #1890ff;
+      margin-top: 20px;
+    }
+    
+    .instructions h3 {
+      font-size: 14px;
+      color: #0050b3;
+      margin-bottom: 8px;
+    }
+    
+    .instructions ul {
+      margin-left: 20px;
+      font-size: 13px;
+      color: #004085;
+    }
+    
+    .instructions li {
+      margin-bottom: 4px;
+    }
+    
+    .map-container {
+      flex: 1;
+      position: relative;
+    }
+    
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .console-log {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #0f0;
+      padding: 12px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-width: 400px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    
+    .console-log-entry {
+      margin-bottom: 4px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    
+    .leaflet-draw-hint-text {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+    
+    .leaflet-draw-hint-subtext {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🗺️ Leaflet Draw External Tooltip</h1>
+    <p>将 Leaflet.draw 的绘制提示移到地图外部 - 纯 JavaScript 实现，无框架依赖</p>
+  </div>
+  
+  <div class="container">
+    <div class="sidebar">
+      <div class="hint-section">
+        <h2>绘制提示</h2>
+        <div id="draw-hint" class="leaflet-draw-hint-container">
+          <div class="leaflet-draw-hint-text">等待绘制...</div>
+          <div class="leaflet-draw-hint-subtext">从左侧工具栏选择工具开始</div>
+        </div>
+      </div>
+      
+      <div class="status-section">
+        <h2>状态信息</h2>
+        <div id="status-list"></div>
+      </div>
+      
+      <div class="instructions">
+        <h3>📝 使用说明</h3>
+        <ul>
+          <li>点击左侧地图工具栏开始绘制</li>
+          <li>绘制提示会显示在这个侧边栏中</li>
+          <li>支持折线、多边形、矩形、圆形、标记</li>
+          <li>错误提示会以红色高亮显示</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="map-container">
+      <div id="map"></div>
+      <div id="console-log" class="console-log"></div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Leaflet Draw JS -->
+  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  
+  <!-- 插件 (ES Module) -->
+  <script type="module">
+    import { installLeafletDrawExternalTooltip } from '../dist/leaflet-draw-tooltip.min.js';
+    
+    // 日志工具
+    const consoleLog = document.getElementById('console-log');
+    const statusList = document.getElementById('status-list');
+    
+    function log(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = 'console-log-entry';
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      consoleLog.appendChild(entry);
+      consoleLog.scrollTop = consoleLog.scrollHeight;
+      
+      // 同时显示在状态区域
+      const statusItem = document.createElement('div');
+      statusItem.className = `status-item ${type === 'success' ? 'success' : type === 'error' ? 'error' : ''}`;
+      statusItem.innerHTML = `<strong>${type.toUpperCase()}:</strong> ${message}`;
+      statusList.insertBefore(statusItem, statusList.firstChild);
+      
+      // 保持最多显示 5 条
+      while (statusList.children.length > 5) {
+        statusList.removeChild(statusList.lastChild);
+      }
+    }
+    
+    log('初始化中...', 'info');
+    
+    // 检查依赖
+    if (typeof L === 'undefined') {
+      log('❌ Leaflet 未加载', 'error');
+      throw new Error('Leaflet not loaded');
+    }
+    
+    if (typeof L.Draw === 'undefined') {
+      log('❌ Leaflet.Draw 未加载', 'error');
+      throw new Error('Leaflet.Draw not loaded');
+    }
+    
+    log('✅ 依赖库加载成功', 'success');
+    
+    // 初始化地图
+    const map = L.map('map').setView([39.9042, 116.4074], 13);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
+    
+    log('✅ 地图初始化完成', 'success');
+    
+    // 获取提示容器
+    const tooltipContainer = document.getElementById('draw-hint');
+    
+    // 安装外部 tooltip
+    try {
+      const { cleanup, tooltip } = installLeafletDrawExternalTooltip({
+        map: map,
+        el: tooltipContainer,
+        hideMapTooltip: true,
+        sanitize: true,
+        onUpdate: (content, state) => {
+          log(`提示更新: ${content.text || '(空)'} | 可见: ${state.visible}`, 'info');
+          
+          // 更新容器样式
+          tooltipContainer.classList.toggle('visible', state.visible);
+          tooltipContainer.classList.toggle('is-error', state.isError);
+        }
+      });
+      
+      log('✅ 外部 Tooltip 安装成功', 'success');
+      
+      // 创建绘制控件
+      const drawControl = new L.Control.Draw({
+        draw: {
+          polyline: {
+            shapeOptions: {
+              color: '#3388ff',
+              weight: 4
+            }
+          },
+          polygon: {
+            shapeOptions: {
+              color: '#3388ff'
+            }
+          },
+          rectangle: {
+            shapeOptions: {
+              color: '#3388ff'
+            }
+          },
+          circle: {
+            shapeOptions: {
+              color: '#3388ff'
+            }
+          },
+          marker: true,
+          circlemarker: false
+        },
+        edit: {
+          featureGroup: new L.FeatureGroup()
+        }
+      });
+      
+      map.addControl(drawControl);
+      log('✅ 绘制控件已添加', 'success');
+      
+      // 将编辑图层组添加到地图
+      const editableLayers = drawControl.options.edit.featureGroup;
+      map.addLayer(editableLayers);
+      
+      // 绘制完成事件
+      map.on(L.Draw.Event.CREATED, function(event) {
+        const layer = event.layer;
+        const type = event.layerType;
+        
+        editableLayers.addLayer(layer);
+        log(`✅ ${type} 绘制完成并添加到地图`, 'success');
+        
+        // 清空提示（很重要！）
+        tooltip.updateContent({});
+      });
+      
+      // 绘制开始事件
+      map.on('draw:drawstart', function(event) {
+        log('🎨 开始绘制', 'info');
+      });
+      
+      // 绘制停止事件
+      map.on('draw:drawstop', function(event) {
+        log('⏸️ 停止绘制', 'info');
+      });
+      
+      log('🎉 所有功能已就绪，可以开始绘制！', 'success');
+      
+    } catch (error) {
+      log(`❌ 初始化失败: ${error.message}`, 'error');
+      console.error(error);
+    }
+  </script>
+</body>
+</html>

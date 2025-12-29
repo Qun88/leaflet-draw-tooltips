@@ -1,0 +1,45 @@
+{
+  "name": "leaflet-draw-tooltips",
+  "version": "1.0.0",
+  "description": "External tooltip plugin for Leaflet.draw - move drawing hints outside the map",
+  "main": "dist/leaflet-draw-tooltip.umd.cjs",
+  "module": "dist/leaflet-draw-tooltip.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/leaflet-draw-tooltip.js",
+      "require": "./dist/leaflet-draw-tooltip.umd.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "keywords": [
+    "leaflet",
+    "leaflet-draw",
+    "tooltip",
+    "external",
+    "plugin"
+  ],
+  "author": "Zhang Qun <zqun.dev@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/leaflet-draw-tooltips.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/leaflet-draw-tooltips/issues"
+  },
+  "homepage": "https://github.com/yourusername/leaflet-draw-tooltips#readme",
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.54.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-string": "^3.0.0",
+    "terser": "^5.44.1"
+  }
+}

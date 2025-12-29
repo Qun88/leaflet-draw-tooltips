@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>简单测试 - Leaflet Draw Tooltip</title>
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <link rel="stylesheet" href="../dist/leaflet-draw-hint.css" />
+  
+  <style>
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    #map { height: 100vh; width: 100%; }
+    
+    #hint {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      min-width: 250px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="hint" class="leaflet-draw-hint-container"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  
+  <script type="module">
+    import { installLeafletDrawExternalTooltip } from '../dist/leaflet-draw-tooltip.min.js';
+    
+    const map = L.map('map').setView([39.9042, 116.4074], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    
+    // 安装插件
+    const { tooltip } = installLeafletDrawExternalTooltip({
+      map: map,
+      el: '#hint',
+      onUpdate: (content, state) => {
+        console.log('📝 Tooltip onUpdate 回调:', { content, state });
+      }
+    });
+    
+    console.log('🔧 插件已安装, tooltip 实例:', tooltip);
+    
+    // 创建绘制控件
+    const drawControl = new L.Control.Draw({
+      draw: {
+        polyline: true,
+        polygon: true,
+        rectangle: true,
+        circle: true,
+        marker: true
+      }
+    });
+    map.addControl(drawControl);
+    
+    // 添加编辑图层
+    const drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+    
+    // 绘制开始事件 - 确保 tooltip 显示
+    map.on(L.Draw.Event.DRAWSTART, function(e) {
+      console.log('🎨 绘制开始 (DRAWSTART)', e);
+      // 强制显示 tooltip（使用一个空格作为占位符，等待实际内容更新）
+      tooltip.updateContent({ text: '准备绘制...', subtext: '' });
+    });
+    
+    // 绘制完成事件
+    map.on(L.Draw.Event.CREATED, function(e) {
+      console.log('✅ 绘制完成 (CREATED)', e);
+      drawnItems.addLayer(e.layer);
+    });
+    
+    // 绘制停止事件 - 清空提示
+    map.on(L.Draw.Event.DRAWSTOP, function(e) {
+      console.log('🛑 绘制停止 (DRAWSTOP)', e);
+      console.log('调用 tooltip.updateContent({}) 清空提示');
+      tooltip.updateContent({}); // 清空提示
+    });
+  </script>
+</body>
+</html>
