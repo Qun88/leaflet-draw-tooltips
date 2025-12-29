@@ -13,15 +13,31 @@
 
 ## 📦 安装
 
+### 方式一：NPM 安装（推荐）
+
 ```bash
 npm install leaflet-draw-tooltips
 ```
 
-或者直接使用 CDN：
+### 方式二：直接引用（开发环境）
+
+从本项目的 `dist` 目录中引用构建好的文件：
 
 ```html
-<script src="https://unpkg.com/leaflet-draw-tooltips/dist/leaflet-draw-tooltip.umd.cjs"></script>
+<!-- ES Module -->
+<script type="module">
+  import { installLeafletDrawExternalTooltip } from './dist/leaflet-draw-tooltip.min.js';
+</script>
+
+<!-- 或使用 UMD 格式（浏览器全局变量） -->
+<script src="./dist/leaflet-draw-tooltip.min.umd.cjs"></script>
+<script>
+  // 通过全局变量 LeafletDrawTooltips 访问
+  const { installLeafletDrawExternalTooltip } = LeafletDrawTooltips;
+</script>
 ```
+
+> **注意**：包发布到 npm 后，可以使用 CDN 如 `https://unpkg.com/leaflet-draw-tooltips@1.0.0/dist/leaflet-draw-tooltip.min.umd.cjs`
 
 ## 🚀 快速开始
 
@@ -225,6 +241,14 @@ map.on(L.Draw.Event.CREATED, function(e) {
 ## 📄 许可证
 
 MIT
+
+## 🙏 致谢
+
+本项目在 [GitHub Copilot](https://github.com/features/copilot) 的辅助下完成开发。
+
+特别感谢：
+- [Leaflet](https://leafletjs.com/)
+- [Leaflet.draw](https://github.com/Leaflet/Leaflet.draw)
 
 ## 🤝 贡献
 

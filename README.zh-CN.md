@@ -15,17 +15,31 @@
 
 ## 📦 安装
 
+### 方式一：NPM 安装（推荐）
+
 ```bash
 npm install leaflet-draw-tooltips
 ```
 
-或者直接在 HTML 中使用：
+### 方式二：直接引用构建文件
+
+从本项目的 `dist` 目录中引用：
 
 ```html
+<!-- ES Module 方式 -->
 <script type="module">
-  import { installLeafletDrawExternalTooltip } from './dist/leaflet-draw-tooltip.js';
+  import { installLeafletDrawExternalTooltip } from './dist/leaflet-draw-tooltip.min.js';
+</script>
+
+<!-- UMD 方式（浏览器全局变量） -->
+<script src="./dist/leaflet-draw-tooltip.min.umd.cjs"></script>
+<link rel="stylesheet" href="./dist/leaflet-draw-hint.css" />
+<script>
+  const { installLeafletDrawExternalTooltip } = LeafletDrawTooltips;
 </script>
 ```
+
+> **说明**：包发布到 npm 后，可通过 CDN 使用，如 `https://unpkg.com/leaflet-draw-tooltips@1.0.0/dist/`
 
 ## 🚀 快速开始
 
@@ -45,7 +59,7 @@ npm install leaflet-draw-tooltips
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
   <script type="module">
-    import { installLeafletDrawExternalTooltip } from './src/index.js';
+    import { installLeafletDrawExternalTooltip } from './dist/leaflet-draw-tooltip.min.js';
 
     const map = L.map('map').setView([51.505, -0.09], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -297,5 +311,8 @@ MIT
 
 ## 🙏 致谢
 
+本项目在 [GitHub Copilot](https://github.com/features/copilot) 的辅助下完成开发。
+
+特别感谢：
 - [Leaflet](https://leafletjs.com/)
 - [Leaflet.draw](https://github.com/Leaflet/Leaflet.draw)
