@@ -76,6 +76,13 @@ export function patchDrawTooltip(config) {
     dispose: function() {
       this._externalTooltip.dispose();
       return this;
+    },
+
+    /**
+     * 空实现，避免调用时报错
+     */
+    _onMouseOut: function() {
+      return;
     }
   });
   
