@@ -33,7 +33,7 @@ export default [
   {
     ...commonConfig,
     output: {
-      file: 'dist/leaflet-draw-tooltip.js',
+      file: 'dist/leaflet-draw-tooltips.js',
       format: 'es',
       banner
     }
@@ -43,7 +43,7 @@ export default [
   {
     ...commonConfig,
     output: {
-      file: 'dist/leaflet-draw-tooltip.min.js',
+      file: 'dist/leaflet-draw-tooltips.min.js',
       format: 'es',
       banner: minBanner
     },
@@ -71,7 +71,7 @@ export default [
   {
     ...commonConfig,
     output: {
-      file: 'dist/leaflet-draw-tooltip.umd.cjs',
+      file: 'dist/leaflet-draw-tooltips.umd.cjs',
       format: 'umd',
       name: 'LeafletDrawTooltip',
       banner,
@@ -85,7 +85,7 @@ export default [
   {
     ...commonConfig,
     output: {
-      file: 'dist/leaflet-draw-tooltip.min.umd.cjs',
+      file: 'dist/leaflet-draw-tooltips.min.umd.cjs',
       format: 'umd',
       name: 'LeafletDrawTooltip',
       banner: minBanner,
