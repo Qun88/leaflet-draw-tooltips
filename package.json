@@ -1,14 +1,14 @@
 {
   "name": "leaflet-draw-tooltips",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "External tooltip plugin for Leaflet.draw - move drawing hints outside the map",
-  "main": "dist/leaflet-draw-tooltip.umd.cjs",
-  "module": "dist/leaflet-draw-tooltip.js",
+  "main": "dist/leaflet-draw-tooltips.umd.cjs",
+  "module": "dist/leaflet-draw-tooltips.js",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/leaflet-draw-tooltip.js",
-      "require": "./dist/leaflet-draw-tooltip.umd.cjs"
+      "import": "./dist/leaflet-draw-tooltips.js",
+      "require": "./dist/leaflet-draw-tooltips.umd.cjs"
     }
   },
   "files": [
@@ -21,7 +21,7 @@
   "keywords": [
     "leaflet",
     "leaflet-draw",
-    "tooltip",
+    "tooltips",
     "external",
     "plugin"
   ],
@@ -29,12 +29,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Qun88/leaflet-draw-tooltip.git"
+    "url": "https://github.com/Qun88/leaflet-draw-tooltips.git"
   },
   "bugs": {
-    "url": "https://github.com/Qun88/leaflet-draw-tooltip/issues"
+    "url": "https://github.com/Qun88/leaflet-draw-tooltips/issues"
   },
-  "homepage": "https://github.com/Qun88/leaflet-draw-tooltip#readme",
+  "homepage": "https://github.com/Qun88/leaflet-draw-tooltips#readme",
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "rollup": "^4.54.0",
