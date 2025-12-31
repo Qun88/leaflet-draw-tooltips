@@ -37,23 +37,31 @@ export class ExternalCardTooltip {
    * 创建内部 DOM 结构
    */
   _setupDOM() {
-    // 清空容器
-    this.containerEl.innerHTML = '';
-    
-    // 创建主文本元素
-    this.textEl = document.createElement('div');
-    this.textEl.className = 'leaflet-draw-hint-text';
-    
-    // 创建副文本元素
-    this.subtextEl = document.createElement('div');
-    this.subtextEl.className = 'leaflet-draw-hint-subtext';
-    
-    // 添加到容器
-    this.containerEl.appendChild(this.textEl);
-    this.containerEl.appendChild(this.subtextEl);
-    
-    // 初始隐藏
-    this.containerEl.style.display = 'none';
+    // 如果容器中已有预期的元素，则重用它们（避免被其它实例清空）
+    const existingText = this.containerEl.querySelector('.leaflet-draw-hint-text');
+    const existingSubtext = this.containerEl.querySelector('.leaflet-draw-hint-subtext');
+
+    if (existingText && existingSubtext) {
+      this.textEl = existingText;
+      this.subtextEl = existingSubtext;
+    } else {
+      // 创建主文本元素
+      this.textEl = document.createElement('div');
+      this.textEl.className = 'leaflet-draw-hint-text';
+
+      // 创建副文本元素
+      this.subtextEl = document.createElement('div');
+      this.subtextEl.className = 'leaflet-draw-hint-subtext';
+
+      // 如果容器为空或没有结构，则追加元素（但不盲目清空已有内容）
+      this.containerEl.appendChild(this.textEl);
+      this.containerEl.appendChild(this.subtextEl);
+    }
+
+    // 初始隐藏（如果尚未设置）
+    if (!this.containerEl.style.display) {
+      this.containerEl.style.display = 'none';
+    }
   }
   
   /**
@@ -131,14 +139,11 @@ export class ExternalCardTooltip {
     // 清空 DOM 内容但不删除元素（外部容器需要保留）
     if (this.textEl) this.textEl.textContent = '';
     if (this.subtextEl) this.subtextEl.textContent = '';
-    
+
     this._notifyUpdate();
-    
-    // 注意：不删除 DOM 元素，只清空引用
-    // DOM 元素（containerEl）是外部传入的，应该保留在页面上
-    this.containerEl = null;
-    this.textEl = null;
-    this.subtextEl = null;
+
+    // 注意：不删除 DOM 元素，也不清空对 DOM 的引用。
+    // containerEl 是外部传入的共享容器，保留引用以便其它实例或返回的 tooltip 继续可用。
     this.onUpdate = null;
   }
   

@@ -34,7 +34,7 @@
   <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
   
   <script type="module">
-    import { installLeafletDrawExternalTooltip } from '../dist/leaflet-draw-tooltip.min.js';
+    import { installLeafletDrawExternalTooltip } from '../dist/leaflet-draw-tooltips.min.js';
     
     const map = L.map('map').setView([39.9042, 116.4074], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -47,6 +47,8 @@
         console.log('📝 Tooltip onUpdate 回调:', { content, state });
       }
     });
+
+    window.tooltip = tooltip; // 方便调试
     
     console.log('🔧 插件已安装, tooltip 实例:', tooltip);
     

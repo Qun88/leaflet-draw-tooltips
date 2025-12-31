@@ -19,23 +19,28 @@ import { ExternalCardTooltip } from './ExternalCardTooltip.js';
  * @param {boolean} config.sanitize - 是否转义 HTML
  * @param {Function} config.onUpdate - 状态更新回调
  */
-export function patchDrawTooltip(config) {
+export function patchDrawTooltip(configOrInstance) {
   if (typeof L === 'undefined' || !L.Draw || !L.Draw.Tooltip) {
     throw new Error('[leaflet-draw-tooltip] Leaflet.draw 未加载，请确保在加载 leaflet-draw 之后调用');
   }
-  
+
+  // 如果传入的是已有的 ExternalCardTooltip 实例，则复用；否则根据 config 创建一个共享实例
+  const sharedExternalTooltip =
+    configOrInstance && configOrInstance instanceof ExternalCardTooltip
+      ? configOrInstance
+      : new ExternalCardTooltip(configOrInstance || {});
+
   // 保存原始类（可选，用于调试）
   const OriginalTooltip = L.Draw.Tooltip;
-  
+
   /**
    * 新的 L.Draw.Tooltip 适配器
-   * 每次实例化时创建新的 ExternalCardTooltip
+   * 所有实例都共享同一个 ExternalCardTooltip
    */
   L.Draw.Tooltip = L.Class.extend({
     initialize: function(map) {
-      // console.log('🆕 L.Draw.Tooltip 实例化，创建新的 ExternalCardTooltip');
-      // 每次都创建新的实例
-      this._externalTooltip = new ExternalCardTooltip(config);
+      // 复用共享实例
+      this._externalTooltip = sharedExternalTooltip;
     },
     
     /**
@@ -74,7 +79,7 @@ export function patchDrawTooltip(config) {
      * 销毁
      */
     dispose: function() {
-      this._externalTooltip.dispose();
+      // 不在此处 dispose 共享实例（以免被局部销毁）。
       return this;
     },
 
@@ -89,4 +94,8 @@ export function patchDrawTooltip(config) {
   // 标记已替换（可用于调试）
   L.Draw.Tooltip._isPatched = true;
   L.Draw.Tooltip._originalClass = OriginalTooltip;
+  // 暴露共享实例以便调试或外部访问
+  L.Draw.Tooltip._sharedExternalTooltip = sharedExternalTooltip;
+
+  return sharedExternalTooltip;
 }

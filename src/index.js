@@ -73,26 +73,24 @@ export function installLeafletDrawExternalTooltip(options = {}) {
     }
   }
   
-  // 4. 准备配置对象（不创建实例）
+  // 4. 准备配置对象并创建共享 ExternalCardTooltip 实例
   const tooltipConfig = {
     containerEl,
     sanitize,
     onUpdate
   };
-  
-  // 5. Runtime 替换 L.Draw.Tooltip（传递配置而非实例）
-  patchDrawTooltip(tooltipConfig);
-  
-  // 6. 创建一个初始实例用于返回（供用户手动控制）
-  const externalTooltip = new ExternalCardTooltip(tooltipConfig);
+
+  // 5. 创建共享实例并让 patch 使用该实例（避免绘制期间产生命名冲突/覆盖）
+  const sharedExternalTooltip = new ExternalCardTooltip(tooltipConfig);
+  patchDrawTooltip(sharedExternalTooltip);
   
   // 8. 返回清理函数和 tooltip 实例
   const cleanup = function() {
-    // 清理用户手动控制的实例
-    if (externalTooltip) {
-      externalTooltip.dispose();
+    // 仅在卸载插件时彻底 dispose 共享实例
+    if (sharedExternalTooltip) {
+      sharedExternalTooltip.dispose();
     }
-    
+
     if (hideMapTooltip) {
       const mapContainer = map.getContainer();
       if (mapContainer) {
@@ -100,9 +98,9 @@ export function installLeafletDrawExternalTooltip(options = {}) {
       }
     }
   };
-  
+
   return {
     cleanup,
-    tooltip: externalTooltip
+    tooltip: sharedExternalTooltip
   };
 }
